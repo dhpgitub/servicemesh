@@ -55,6 +55,8 @@ spec:
         volumeMounts:
           - name: linkerd-nfs
             mountPath: /etc/consul.d
+          - name: linkerd-nfs
+            mountPath: /consul/
 
       - name: servicemesh-telemetry
         image: dhpcontainreg.azurecr.io/core-app/servicemesh-telemetry:1.0.0
