@@ -27,7 +27,7 @@ spec:
       containers:
 
       - name: linkerd
-        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/linkerd:1.4.5
+        image: dhpcontainreg.azurecr.io/core-app/linkerd:1.4.5
         imagePullPolicy: Always
         ports:
          - containerPort: 9990
@@ -41,7 +41,7 @@ spec:
             subPath: config.yaml
 
       - name: consul
-        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/consul:1.2.1
+        image: dhpcontainreg.azurecr.io/core-app/consul:1.2.3
         imagePullPolicy: Always
         args: ["agent", "-server", "-bootstrap-expect", "1", "-ui", "-client", "0.0.0.0"]
         env:
@@ -57,14 +57,14 @@ spec:
             mountPath: /etc/consul.d
 
       - name: servicemesh-telemetry
-        image: dhpcontainreg.azurecr.io/dhpcoreapp/servicemesh-telemetry:1.0.0 
+        image: dhpcontainreg.azurecr.io/core-app/servicemesh-telemetry:1.0.0
         imagePullPolicy: Always
         ports:
          - containerPort: 3000
          - containerPort: 9191
 
       - name: zipkin-storage
-        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/zipkin-elasticsearch6:2.8.4
+        image: dhpcontainreg.azurecr.io/core-app/zipkin-elasticsearch6:2.11.5
         imagePullPolicy: Always
         ports:
           - containerPort: 9200
@@ -72,14 +72,9 @@ spec:
         volumeMounts:
           - name: elasticsearch-nfs
             mountPath: /elasticsearch/data/
-          - name: elasticsearch-disco-nfs
-            mountPath: /elasticsearch/logs/
-#        securityContext:
-#          privileged: true
-#          runAsUser: 1000
 
       - name: zipkin
-        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/zipkin:latest
+        image: dhpcontainreg.azurecr.io/core-app/zipkin:2.11.5
         imagePullPolicy: Always
         env:
         - name: STORAGE_TYPE
@@ -112,17 +107,10 @@ spec:
           persistentVolumeClaim:
             claimName: consulnfsclaim
 
-        - name: consul-disco-nfs
-          persistentVolumeClaim:
-            claimName: consuldiscoclaim
-
         - name: elasticsearch-nfs
           persistentVolumeClaim:
             claimName: elasticsearchnfsclaim
 
-        - name: elasticsearch-disco-nfs
-          persistentVolumeClaim:
-            claimName: elasticsearchdiscoclaim
 
 
 
