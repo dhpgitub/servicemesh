@@ -28,7 +28,9 @@ spec:
 
   selector:
     app: servicemesh
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -52,7 +54,9 @@ spec:
 
   selector:
     app: servicemesh
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
