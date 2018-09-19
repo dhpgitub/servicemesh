@@ -1,0 +1,128 @@
+#
+# The purpose of this script is to create a "deployment" object that wraps the service mesh pod.
+# This allows the containers inside the pod to talk to the outside world
+#
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: servicemesh
+  labels:
+    app: servicemesh
+
+spec:
+  selector:
+    matchLabels:
+      app: servicemesh
+
+  template:
+    metadata:
+      labels:
+        # Note:  See https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+        # the name below should be unique and should not match any other pods
+        app: servicemesh
+    spec:
+      # Note:  proper indention is needed to ensure that the containers and volumes are associated with
+      #        the template specification and not the "outer" specification
+      containers:
+
+      - name: linkerd
+        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/linkerd:1.4.5
+        imagePullPolicy: Always
+        ports:
+         - containerPort: 9990
+         - containerPort: 4140
+        args: ["/mnt/config/config.yaml"]
+        volumeMounts:
+          - mountPath: /mnt/config
+            name: linkerd-nfs
+          - mountPath: /mnt/config/config.yaml
+            name: linkerd-configmap
+            subPath: config.yaml
+
+      - name: consul
+        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/consul:1.2.1
+        imagePullPolicy: Always
+        args: ["agent", "-server", "-bootstrap-expect", "1", "-ui", "-client", "0.0.0.0"]
+        env:
+        - name: CONSUL_LOCAL_CONFIG
+          value: "{\"datacenter\":\"dev\", \"data_dir\":\"/tmp/data\", \"enable_debug\":true, \"disable_host_node_id\":true}"
+        ports:
+         - containerPort: 8300
+         - containerPort: 8301
+         - containerPort: 8500
+         - containerPort: 8600
+        volumeMounts:
+          - name: linkerd-nfs
+            mountPath: /etc/consul.d
+
+      - name: servicemesh-telemetry
+        image: dhpcontainreg.azurecr.io/dhpcoreapp/servicemesh-telemetry:1.0.0 
+        imagePullPolicy: Always
+        ports:
+         - containerPort: 3000
+         - containerPort: 9191
+
+      - name: zipkin-storage
+        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/zipkin-elasticsearch6:2.8.4
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 9200
+          - containerPort: 9300
+        volumeMounts:
+          - name: elasticsearch-nfs
+            mountPath: /elasticsearch/data/
+          - name: elasticsearch-disco-nfs
+            mountPath: /elasticsearch/logs/
+#        securityContext:
+#          privileged: true
+#          runAsUser: 1000
+
+      - name: zipkin
+        image: dhpcontainreg.azurecr.io/dhpcore-infrastructure/zipkin:latest
+        imagePullPolicy: Always
+        env:
+        - name: STORAGE_TYPE
+          value: "elasticsearch"
+        - name: ES_HOSTS
+          # Since zipkin and elasticsearch are running in the same POD, you can also specify the elasticsearch host like this:
+          value: "localhost"
+        - name: SCRIBE_ENABLED
+          value: "true"
+        ports:
+        - containerPort: 9410
+        - containerPort: 9411
+
+#       Note:  proper indention is needed to ensure that the containers and volumes are associated with
+#              the template specification and not the "outer" specification
+      volumes:
+        - name: linkerd-nfs
+          persistentVolumeClaim:
+            claimName: linkerdnfsclaim
+
+        - name: linkerd-disco-nfs
+          persistentVolumeClaim:
+            claimName: linkerddiscoclaim
+
+        - name: linkerd-configmap
+          configMap:
+            name: l5d-config
+
+        - name: consul-nfs
+          persistentVolumeClaim:
+            claimName: consulnfsclaim
+
+        - name: consul-disco-nfs
+          persistentVolumeClaim:
+            claimName: consuldiscoclaim
+
+        - name: elasticsearch-nfs
+          persistentVolumeClaim:
+            claimName: elasticsearchnfsclaim
+
+        - name: elasticsearch-disco-nfs
+          persistentVolumeClaim:
+            claimName: elasticsearchdiscoclaim
+
+
+
