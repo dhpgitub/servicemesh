@@ -1,50 +1,16 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: consuldiscoclaim
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: servicemesh-storageclass
-  resources:
-    requests:
-      storage: 1Gi
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: linkerddiscoclaim
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: linkerddiscostorageclass
-  resources:
-    requests:
-      storage: 1Gi
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: consulnfsclaim
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: servicemesh-storageclass
+  storageClassName: uid100
   resources:
     requests:
       storage: 1Gi
 
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: elasticsearchdiscoclaim
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: servicemesh-storageclass
-  resources:
-    requests:
-      storage: 1Gi
+---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -53,10 +19,12 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: servicemesh-storageclass
+  storageClassName: uid100
   resources:
     requests:
       storage: 1Gi
+
+---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -65,10 +33,12 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: servicemesh-storageclass
+  storageClassName: uid1000
   resources:
     requests:
       storage: 1Gi
+
+---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -77,8 +47,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: servicemesh-storageclass
+  storageClassName: uid1000
   resources:
     requests:
       storage: 1Gi
-
