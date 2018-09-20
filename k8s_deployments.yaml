@@ -46,17 +46,15 @@ spec:
         args: ["agent", "-server", "-bootstrap-expect", "1", "-ui", "-client", "0.0.0.0"]
         env:
         - name: CONSUL_LOCAL_CONFIG
-          value: "{\"datacenter\":\"dev\", \"data_dir\":\"/tmp/data\", \"enable_debug\":true, \"disable_host_node_id\":true}"
+          value: "{\"datacenter\":\"dev\", \"enable_debug\":true, \"disable_host_node_id\":true}"
         ports:
          - containerPort: 8300
          - containerPort: 8301
          - containerPort: 8500
          - containerPort: 8600
         volumeMounts:
-          - name: linkerd-nfs
-            mountPath: /etc/consul.d
-          - name: linkerd-nfs
-            mountPath: /consul/
+          - name: consul-nfs
+            mountPath: /consul/data
 
       - name: servicemesh-telemetry
         image: dhpcontainreg.azurecr.io/core-app/servicemesh-telemetry:1.0.0
