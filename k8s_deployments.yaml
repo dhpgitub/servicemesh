@@ -39,6 +39,8 @@ spec:
           - mountPath: /mnt/config/config.yaml
             name: linkerd-configmap
             subPath: config.yaml
+          - mountPath: /mnt/disco
+            name: linkerd-disco-nfs
 
       - name: consul
         image: dhpcontainreg.azurecr.io/core-app/consul:1.2.3
