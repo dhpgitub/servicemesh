@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: l5d-config
+data:
+  config.yaml: |-
+    # Set the network address and port that the admin UI listens on
+    admin:
+      ip: 0.0.0.0
+      port: 9990
+
+    namers:
+      # configure consul service discovery
+    - kind: io.l5d.consul
+      host: servicemesh-consul
+      port: 8500
+      includeTag: false
+      # use Consul to tell if a downstream service is healthy or not
+      useHealthCheck: false
+      setHost: true
+      healthStatuses:
+       - "passing"
+       - "warning"
+
+    routers:
+    - protocol: http
+      dstPrefix: /svc
+
+      # use the request path to route to the appropriate downstream host
+      # for example if the http request is like:
+      # http://dhpxsmeshpoc3:4140/test-service/v1/add?number1=1&number2=5
+      # then the first segment in the URL (e.g., test-service) is used
+      # to determine the host to bind to
+      identifier:
+        kind: io.l5d.path
+        segments: 1
+        consume: true
+
+      # configure the delegation table (dtabs)
+      # this takes a logical name and translates it to a concrete name
+      # see https://linkerd.io/advanced/dtabs/
+      #
+      # *****   Important: the data center tag must match exactly the datacenter listed in Consul
+      dtab: |
+         /svc => /#/io.l5d.consul/dev;
+
+      httpAccessLog: logs/access.log
+      label: internal
+
+      # set the ip address and port that Linkerd will listen on
+      servers:
+      - port: 4140
+        ip: 0.0.0.0
+
+        # configure TLS
+    #    tls:
+    #      certPath: /opt/linkerd/certificates/certificate.pem
+    #      keyPath: /opt/linkerd/certificates/key.pem
+
+      client:
+        # set the load balancer parameters
+        loadBalancer:
+           kind: roundRobin
+           maxEffort: 5
+
+        # set the circuit breaker parameters
+        failureAccrual:
+           kind: io.l5d.consecutiveFailures
+           failures: 3
+           backoff:
+             kind: constant
+             ms: 10000
+
+    telemetry:
+      # log 20% of all requests
+    - kind: io.l5d.tracelog
+      sampleRate: 0.2
+      level: DEBUG
+
+      # add support for Zipkin
+    - kind: io.l5d.zipkin
+      # note that the hostname zipkin is provided by docker-compose
+      # networking features
+      host: servicemesh-zipkin
+      port: 9410
+      sampleRate: 1.0
+
+      # add support for linkerd visualization plugin
+    - kind: io.l5d.prometheus
+      path: /admin/metrics/prometheus
+
+ 
