@@ -27,7 +27,7 @@ spec:
       containers:
 
       - name: linkerd
-        image: dhpcontainreg.azurecr.io/core-app/linkerd:1.4.6
+        image: dhpcontainreg.azurecr.io/core-app/dhp_linkerd:1.4.6-8u181
         imagePullPolicy: Always
         ports:
          - containerPort: 9990
