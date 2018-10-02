@@ -64,6 +64,9 @@ spec:
         ports:
          - containerPort: 3000
          - containerPort: 9191
+        volumeMounts:
+          - name: telemetry-nfs
+            mountPath: /prometheus
 
       - name: zipkin-storage
         image: dhpcontainreg.azurecr.io/core-app/zipkin-elasticsearch6:2.11.5
@@ -113,6 +116,6 @@ spec:
           persistentVolumeClaim:
             claimName: elasticsearchnfsclaim
 
-
-
-
+        - name: telemetry-nfs
+          persistentVolumeClaim:
+            claimName: telemetrynfsclaim

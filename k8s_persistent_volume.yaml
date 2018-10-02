@@ -51,3 +51,17 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: telemetrynfsclaim
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: uid1000
+  resources:
+    requests:
+      storage: 1Gi
