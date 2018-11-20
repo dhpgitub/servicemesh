@@ -10,7 +10,7 @@ mountOptions:
   - gid=1000
 parameters:
   skuName: Standard_LRS
-  storageAccount: surferstorageacct
+  storageAccount: statstorageacct
 
 ---
 
@@ -26,5 +26,5 @@ mountOptions:
   - gid=100
 parameters:
   skuName: Standard_LRS
-  storageAccount: surferstorageacct
+  storageAccount: statstorageacct
 
